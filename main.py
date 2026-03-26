@@ -3,8 +3,16 @@ from transformers import pipeline
 from pydantic import BaseModel
 
 
+from pydantic import BaseModel, Field, validator
+
 class Item(BaseModel):
-    text: str
+    text: str = Field(..., min_length=1, max_length=500, description="Текст для анализа тональности")
+    
+    @validator('text')
+    def text_not_empty(cls, v):
+        if not v or v.strip() == '':
+            raise ValueError('Текст не может быть пустым')
+        return v.strip()
 
 
 app = FastAPI()
